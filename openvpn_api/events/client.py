@@ -7,7 +7,7 @@ from openvpn_api import events
 
 logger = logging.getLogger("vpn.events.client")
 FIRST_LINE_REGEX = re.compile(r"^>CLIENT:(?P<event>([^,]+))(.*)$")
-ENV_REGEX = re.compile(r">CLIENT:ENV,(?P<key>([^=]+))=(?P<value>(.+))")
+ENV_REGEX = re.compile(r"^>CLIENT:ENV,(?P<key>([^=]+))=(?P<value>(.*))$")
 
 
 @events.register_event
