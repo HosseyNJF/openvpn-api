@@ -125,15 +125,27 @@ class VPN:
         """Thread to handle socket I/O and event callbacks.
         """
         active_event_lines = []
+        last_line = None
         while not self._stop_thread.is_set():
             socks, _, _ = select.select((self._socket, self._internal_rx), (), ())
 
             for sock in socks:
                 if sock is self._socket:
-                    raw = self._socket.recv(4096).decode("utf-8")
-                    for line in raw.split("\n"):  # Sometimes lines are sent bundled up
+                    raw = self._socket.recv(65536).decode("utf-8")
+
+                    lines = raw.split("\n")  # Sometimes lines are sent bundled up
+                    line_count = len(lines)
+                    for idx, line in enumerate(lines):
                         if line == "":
                             continue
+                        elif idx + 1 == line_count:  # The last line should always be empty if data isn't chunked
+                            # The last line is NOT terminated with LF and it's chunked, should append next line to it
+                            last_line = line
+                            continue
+
+                        if idx == 0 and last_line is not None:
+                            line = last_line + line
+                            last_line = None
 
                         if self._active_event is None:
                             for event in events.get_event_types():
