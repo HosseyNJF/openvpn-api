@@ -26,7 +26,7 @@ class ClientEvent(events.BaseEvent):
         client_id: int,
         key_id: Optional[int] = None,
         primary: Optional[int] = None,
-        address=None,
+        address: Optional[str] = None,
         environment: Dict[str, str] = None,
     ):
         self.type = event_type
@@ -86,7 +86,7 @@ class ClientEvent(events.BaseEvent):
         client_id = int(first_line_data["client_id"])
         key_id = int(first_line_data["key_id"]) if "key_id" in first_line_data else None
         primary = int(first_line_data["key_id"]) if "key_id" in first_line_data else None
-        address = int(first_line_data["address"]) if "address" in first_line_data else None
+        address = str(first_line_data["address"]) if "address" in first_line_data else None
         environment = {}
 
         if event_type != "ADDRESS":
