@@ -103,7 +103,7 @@ class ClientEvent(events.BaseEvent):
             else:
                 raise errors.ParseError("The raw event doesn't have an >CLIENT:ENV,END line.")
 
-            if not environment:
+            if not environment and event_type != "DISCONNECT":
                 raise errors.ParseError("This event type (%s) doesn't support empty environment." % event_type)
 
         return ClientEvent(
