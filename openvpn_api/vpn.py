@@ -136,6 +136,8 @@ class VPN:
                     lines = raw.split("\n")  # Sometimes lines are sent bundled up
                     line_count = len(lines)
                     for idx, line in enumerate(lines):
+                        line = line.strip()
+
                         if line == "":
                             continue
                         elif idx + 1 == line_count:  # The last line should always be empty if data isn't chunked
