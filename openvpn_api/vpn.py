@@ -12,6 +12,7 @@ import openvpn_status
 from openvpn_status.models import Status
 
 from openvpn_api import events
+from openvpn_api.events.updown import UpDownEvent
 from openvpn_api.models.state import State
 from openvpn_api.models.stats import ServerStats
 from openvpn_api.util import errors
@@ -42,6 +43,7 @@ class VPN:
         self._callbacks: Set = set()
         self._socket_thread: Optional[threading.Thread] = None
         self._stop_thread: threading.Event = threading.Event()
+        self._try_reconnecting: threading.Event = threading.Event()
         self._recv_queue: queue.Queue = queue.Queue()
         self._send_queue: queue.Queue = queue.Queue()
         self._internal_rx: Optional[socket.socket] = None
@@ -101,10 +103,15 @@ class VPN:
                 self._socket_send("quit\n")
             assert self._internal_tx is not None and self._internal_rx is not None
             self.stop_event_loop()
-            self._internal_rx.close()
-            self._internal_tx.close()
-            self._socket.close()
-            self._socket = None
+            self._clear_sockets()
+        elif self._try_reconnecting.is_set():
+            self._try_reconnecting.clear()
+
+    def _clear_sockets(self):
+        self._internal_rx.close()
+        self._internal_tx.close()
+        self._socket.close()
+        self._socket = None
 
     @property
     def is_connected(self) -> bool:
@@ -127,12 +134,28 @@ class VPN:
         """
         active_event_lines = []
         last_line = None
-        while not self._stop_thread.is_set():
+        internal_break = False
+        while not self._stop_thread.is_set() and not internal_break:
             socks, _, _ = select.select((self._socket, self._internal_rx), (), (), self._timeout)
 
             for sock in socks:
                 if sock is self._socket:
                     raw = self._socket.recv(65536).decode("utf-8")
+
+                    # If select.select says the file is ready but there is no data, it means the connection is dropped
+                    if not raw:
+                        self._clear_sockets()
+                        self._try_reconnecting.set()
+                        self.raise_event(UpDownEvent(UpDownEvent.DOWN))
+                        while self._try_reconnecting.is_set():
+                            try:
+                                self.connect()
+                            except errors.ConnectError:
+                                continue
+                            self._try_reconnecting.clear()
+                            self.raise_event(UpDownEvent(UpDownEvent.UP))
+                        internal_break = True
+                        break  # Ignore processing send queue because the old socket is disconnected
 
                     lines = raw.split("\n")  # Sometimes lines are sent bundled up
                     line_count = len(lines)
