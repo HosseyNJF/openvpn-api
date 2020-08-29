@@ -25,7 +25,7 @@ class VPNType(str, Enum):
 
 
 class VPN:
-    def __init__(self, host: str = None, port: int = None, unix_socket: str = None):
+    def __init__(self, host: str = None, port: int = None, unix_socket: str = None, timeout: float = None):
         if (unix_socket and host) or (unix_socket and port) or (not unix_socket and not host and not port):
             raise errors.VPNError("Must specify either socket or host and port")
 
@@ -33,6 +33,7 @@ class VPN:
         self._mgmt_host: Optional[str] = host
         self._mgmt_port: Optional[int] = port
         self._socket: Optional[socket.socket] = None
+        self._timeout = timeout
 
         # Release info cache
         self._release: Optional[str] = None
@@ -127,7 +128,7 @@ class VPN:
         active_event_lines = []
         last_line = None
         while not self._stop_thread.is_set():
-            socks, _, _ = select.select((self._socket, self._internal_rx), (), ())
+            socks, _, _ = select.select((self._socket, self._internal_rx), (), (), self._timeout)
 
             for sock in socks:
                 if sock is self._socket:
@@ -176,7 +177,7 @@ class VPN:
                     if status == b"\x00":  # Send data if OK
                         try:
                             data = self._send_queue.get(block=False)
-                            self._socket.send(bytes(data, "utf-8"))
+                            self._socket.sendall(bytes(data, "utf-8"))
                         except queue.Empty:
                             pass
 
@@ -187,7 +188,7 @@ class VPN:
             raise errors.NotConnectedError("You must be connected to the management interface to issue commands.")
         self._send_queue.put(data)
         assert self._internal_tx is not None
-        self._internal_tx.send(b"\x00")  # Wake socket thread to send data
+        self._internal_tx.sendall(b"\x00")  # Wake socket thread to send data
 
     def _socket_recv(self) -> str:
         """Receive bytes from socket and convert to string.
@@ -211,7 +212,7 @@ class VPN:
     def stop_event_loop(self) -> None:
         """Halt the event loop, stops handling of socket communications"""
         self._stop_thread.set()
-        self._internal_tx.send(b"\x01")  # Wake socket thread to allow it to close
+        self._internal_tx.sendall(b"\x01")  # Wake socket thread to allow it to close
         if self._socket_thread is not None:
             self._socket_thread.join()
             self._socket_thread = None
