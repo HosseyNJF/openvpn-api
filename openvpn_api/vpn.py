@@ -253,7 +253,7 @@ class VPN:
             try:
                 func(event)
             except Exception:  # Ignore exceptions as we want to call the other handlers
-                pass
+                logging.exception("Exception when calling callback")
 
     # Interface commands and parsing
 
