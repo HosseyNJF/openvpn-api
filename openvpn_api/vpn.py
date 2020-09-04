@@ -237,7 +237,9 @@ class VPN:
         self._socket_send(cmd + "\n")
         resp = self._socket_recv()
         if cmd.strip() not in ("load-stats", "signal SIGTERM"):
-            while not (resp.strip().endswith("END") or resp.strip().startswith("SUCCESS:")):
+            while not (resp.strip().endswith("END") or
+                       resp.strip().startswith("SUCCESS:") or
+                       resp.strip().startswith("ERROR:")):
                 resp += self._socket_recv()
         logger.debug("Cmd response: %r", resp)
         return resp
