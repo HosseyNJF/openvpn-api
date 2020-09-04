@@ -230,19 +230,20 @@ class VPN:
             raise errors.NotConnectedError("You must be connected to the management interface to issue commands.")
         return self._recv_queue.get()
 
-    def send_command(self, cmd) -> str:
+    def send_command(self, cmd, blocking=True) -> str:
         """Send command to management interface and fetch response.
         """
         logger.debug("Sending cmd: %r", cmd.strip())
         self._socket_send(cmd + "\n")
-        resp = self._socket_recv()
-        if cmd.strip() not in ("load-stats", "signal SIGTERM"):
-            while not (resp.strip().endswith("END") or
-                       resp.strip().startswith("SUCCESS:") or
-                       resp.strip().startswith("ERROR:")):
-                resp += self._socket_recv()
-        logger.debug("Cmd response: %r", resp)
-        return resp
+        if blocking:
+            resp = self._socket_recv()
+            if cmd.strip() not in ("load-stats", "signal SIGTERM"):
+                while not (resp.strip().endswith("END") or
+                           resp.strip().startswith("SUCCESS:") or
+                           resp.strip().startswith("ERROR:")):
+                    resp += self._socket_recv()
+            logger.debug("Cmd response: %r", resp)
+            return resp
 
     def stop_event_loop(self) -> None:
         """Halt the event loop, stops handling of socket communications"""
