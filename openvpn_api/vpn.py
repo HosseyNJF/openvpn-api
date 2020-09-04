@@ -84,6 +84,8 @@ class VPN:
             else:
                 raise ValueError("Invalid connection type")
 
+            self._clear_queue(self._recv_queue)
+            self._clear_queue(self._send_queue)
             self._internal_rx, self._internal_tx = socket.socketpair()
             self._socket_thread = threading.Thread(target=self._socket_thread_runner, daemon=True, name="vpn-io")
             self._socket_thread.start()
@@ -112,6 +114,14 @@ class VPN:
         self._internal_tx.close()
         self._socket.close()
         self._socket = None
+
+    @classmethod
+    def _clear_queue(cls, q: queue.Queue):
+        try:
+            while True:
+                q.get_nowait()
+        except queue.Empty:
+            pass
 
     @property
     def is_connected(self) -> bool:
