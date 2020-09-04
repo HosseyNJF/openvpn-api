@@ -244,6 +244,8 @@ class VPN:
     def register_callback(self, callable: Callable) -> None:
         """Register a callback with the event handler for incoming messages.
         Callbacks should be kept as lightweight as possible and not perform any heavy or time consuming computation.
+        NEVER send a command inside a callback. instead, add it to your own queue and process it outside the callback.
+        TODO: Fix sending command inside callback
         """
         self._callbacks.add(callable)
 
