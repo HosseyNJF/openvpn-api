@@ -169,18 +169,30 @@ class VPN:
 
                     lines = raw.split("\n")  # Sometimes lines are sent bundled up
                     line_count = len(lines)
-                    for idx, line in enumerate(lines):
+                    idx = -1
+                    while True:
+                        idx += 1
+                        if idx >= line_count:
+                            break
+
+                        line = lines[idx]
                         line = line.strip()
 
                         if line == "":
                             continue
-                        elif idx + 1 == line_count:  # The last line should always be empty if data isn't chunked
-                            # The last line is NOT terminated with LF and it's chunked, should append next line to it
+                        # The last line is usually empty if the data isn't chunked
+                        elif idx + 1 == line_count:
+                            # The last line is NOT terminated with LF and may be chunked, should append next line to it
                             last_line = line
                             continue
 
+                        # If the new line is a notification itself, we'll know the previous line was a whole
                         if idx == 0 and last_line is not None:
-                            line = last_line + line
+                            if line.startswith('>'):
+                                idx -= 1
+                                line = last_line  # Process the remaining line before current line
+                            else:
+                                line = last_line + line
                             last_line = None
 
                         if self._active_event is None:
