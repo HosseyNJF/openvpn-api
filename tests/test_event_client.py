@@ -1,7 +1,7 @@
 import unittest
 
-from openvpn_api.events.client import ClientEvent
-from openvpn_api.util import errors
+from openvpn_management_api.events.client import ClientEvent
+from openvpn_management_api.util import errors
 
 
 class TestEventClient(unittest.TestCase):

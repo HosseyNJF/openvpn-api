@@ -1,6 +1,6 @@
 from typing import List
 
-from openvpn_api import events
+from openvpn_management_api import events
 
 
 @events.register_event

@@ -1,7 +1,7 @@
 import abc
 from typing import Optional, Tuple, Union
 
-from openvpn_api import constants
+from openvpn_management_api import constants
 
 
 class VPNModelBase(abc.ABC):

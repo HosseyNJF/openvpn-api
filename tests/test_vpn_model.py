@@ -2,8 +2,8 @@ import unittest
 import socket
 from unittest.mock import patch, PropertyMock, ANY, MagicMock
 import openvpn_status
-from openvpn_api.util import errors
-from openvpn_api.vpn import VPN, VPNType
+from openvpn_management_api.util import errors
+from openvpn_management_api.vpn import VPN, VPNType
 
 
 def gen_mock_values(values):
@@ -47,7 +47,7 @@ class TestVPNModel(unittest.TestCase):
         self.assertIsNone(vpn._release)
         self.assertIsNone(vpn._socket)
 
-    @patch("openvpn_api.vpn.socket.create_connection")
+    @patch("openvpn_management_api.vpn.socket.create_connection")
     def test_connect_ip_failure(self, mock_create_connection):
         vpn = VPN(host="localhost", port=1234)
         mock_create_connection.side_effect = socket.error()
@@ -57,8 +57,8 @@ class TestVPNModel(unittest.TestCase):
         with self.assertRaises(errors.ConnectError):
             vpn.connect()
 
-    @patch("openvpn_api.vpn.VPN.connect")
-    @patch("openvpn_api.vpn.VPN.disconnect")
+    @patch("openvpn_management_api.vpn.VPN.connect")
+    @patch("openvpn_management_api.vpn.VPN.disconnect")
     def test_connection_manager(self, mock_disconnect, mock_connect):
         vpn = VPN(host="localhost", port=1234)
         with vpn.connection():
@@ -73,9 +73,9 @@ class TestVPNModel(unittest.TestCase):
         with self.assertRaises(errors.NotConnectedError):
             vpn.send_command("asd")
 
-    @patch("openvpn_api.vpn.VPN._socket_recv")
-    @patch("openvpn_api.vpn.VPN._socket_send")
-    @patch("openvpn_api.vpn.socket.create_connection")
+    @patch("openvpn_management_api.vpn.VPN._socket_recv")
+    @patch("openvpn_management_api.vpn.VPN._socket_send")
+    @patch("openvpn_management_api.vpn.socket.create_connection")
     def test_send_command(self, mock_create_connection, mock_socket_send, mock_socket_recv):
         vpn = VPN(host="localhost", port=1234)
         vpn.connect()
@@ -89,9 +89,9 @@ class TestVPNModel(unittest.TestCase):
         self.assertEqual(2, mock_socket_recv.call_count)
         self.assertEqual(a, "asd\nEND\n")
 
-    @patch("openvpn_api.vpn.VPN._socket_recv")
-    @patch("openvpn_api.vpn.VPN._socket_send")
-    @patch("openvpn_api.vpn.socket.create_connection")
+    @patch("openvpn_management_api.vpn.VPN._socket_recv")
+    @patch("openvpn_management_api.vpn.VPN._socket_send")
+    @patch("openvpn_management_api.vpn.socket.create_connection")
     def test_send_command_kill(self, mock_create_connection, mock_socket_send, mock_socket_recv):
         # This test just makes sure we don't infinitely loop reading from socket waiting for END
         # Needs rewriting once we add methods for killing clients.
@@ -116,10 +116,10 @@ class TestVPNModel(unittest.TestCase):
         mock_socket_send.assert_called_once_with("client-kill 1\n")
         mock_socket_recv.assert_called_once()
 
-    @patch("openvpn_api.vpn.VPN.stop_event_loop")
-    @patch("openvpn_api.vpn.VPN._socket_recv")
-    @patch("openvpn_api.vpn.VPN._socket_send")
-    @patch("openvpn_api.vpn.socket.create_connection")
+    @patch("openvpn_management_api.vpn.VPN.stop_event_loop")
+    @patch("openvpn_management_api.vpn.VPN._socket_recv")
+    @patch("openvpn_management_api.vpn.VPN._socket_send")
+    @patch("openvpn_management_api.vpn.socket.create_connection")
     def test_send_sigterm(self, mock_create_connection, mock_socket_send, mock_socket_recv, mock_stop_event_loop):
         vpn = VPN(host="localhost", port=1234)
         vpn.connect()
@@ -131,7 +131,7 @@ class TestVPNModel(unittest.TestCase):
         mock_socket_send.assert_called_once_with("signal SIGTERM\n")
         mock_socket_recv.assert_called_once()
 
-    @patch("openvpn_api.vpn.VPN.send_command")
+    @patch("openvpn_management_api.vpn.VPN.send_command")
     def test__get_version(self, mock_send_command):
         vpn = VPN(host="localhost", port=1234)
         mock_send_command.return_value = """
@@ -161,7 +161,7 @@ END
         mock_send_command.assert_called_once_with("version")
         mock_send_command.reset_mock()
 
-    @patch("openvpn_api.vpn.VPN._get_version")
+    @patch("openvpn_management_api.vpn.VPN._get_version")
     def test_release(self, mock_get_version):
         vpn = VPN(host="localhost", port=1234)
         self.assertIsNone(vpn._release)
@@ -175,7 +175,7 @@ END
         self.assertEqual(vpn.release, "asd")
         mock_get_version.assert_not_called()
 
-    @patch("openvpn_api.vpn.VPN._get_version")
+    @patch("openvpn_management_api.vpn.VPN._get_version")
     def test_version(self, mock_get_version):
         vpn = VPN(host="localhost", port=1234)
         vpn._release = "OpenVPN 2.4.4 x86_64-pc-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] built on Sep  5 2018"
@@ -196,8 +196,8 @@ END
         self.assertEqual("Unable to parse version from release string.", str(ctx.exception))
         mock_get_version.assert_not_called()
 
-    @patch("openvpn_api.vpn.VPN.send_command")
-    @patch("openvpn_api.models.state.State.parse_raw")
+    @patch("openvpn_management_api.vpn.VPN.send_command")
+    @patch("openvpn_management_api.models.state.State.parse_raw")
     def test_get_state(self, mock_parse_raw, mock_send_command):
         vpn = VPN(host="localhost", port=1234)
         state = vpn.get_state()
@@ -205,7 +205,7 @@ END
         mock_parse_raw.assert_called_once()
         self.assertIsNotNone(state)
 
-    @patch("openvpn_api.vpn.VPN.release", new_callable=PropertyMock)
+    @patch("openvpn_management_api.vpn.VPN.release", new_callable=PropertyMock)
     def test_cache(self, release_mock):
         """Test caching VPN metadata works and clears correctly.
         """
@@ -216,8 +216,8 @@ END
         vpn.clear_cache()
         self.assertIsNone(vpn._release)
 
-    @patch("openvpn_api.vpn.VPN.send_command")
-    @patch("openvpn_api.models.stats.ServerStats.parse_raw")
+    @patch("openvpn_management_api.vpn.VPN.send_command")
+    @patch("openvpn_management_api.models.stats.ServerStats.parse_raw")
     def test_get_stats(self, mock_parse_raw, mock_send_command):
         vpn = VPN(host="localhost", port=1234)
         stats = vpn.get_stats()
@@ -225,7 +225,7 @@ END
         mock_parse_raw.assert_called_once()
         self.assertIsNotNone(stats)
 
-    @patch("openvpn_api.vpn.VPN.send_command")
+    @patch("openvpn_management_api.vpn.VPN.send_command")
     def test_get_status(self, mock):
         vpn = VPN(host="localhost", port=1234)
         mock.return_value = """OpenVPN CLIENT LIST

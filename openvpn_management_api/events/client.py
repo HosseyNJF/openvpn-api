@@ -2,8 +2,8 @@ import re
 import logging
 from typing import List, Dict, Optional
 
-from openvpn_api.util import errors
-from openvpn_api import events
+from openvpn_management_api.util import errors
+from openvpn_management_api import events
 
 logger = logging.getLogger("vpn.events.client")
 FIRST_LINE_REGEX = re.compile(r"^>CLIENT:(?P<event>([^,]+))(.*)$")
@@ -103,8 +103,8 @@ class ClientEvent(events.BaseEvent):
             else:
                 raise errors.ParseError("The raw event doesn't have an >CLIENT:ENV,END line.")
 
-            if not environment and event_type != "DISCONNECT":
-                raise errors.ParseError("This event type (%s) doesn't support empty environment." % event_type)
+        if not environment and event_type != "ADDRESS":
+            raise errors.ParseError("This event type (%s) doesn't support empty environment." % event_type)
 
         return ClientEvent(
             event_type=event_type,

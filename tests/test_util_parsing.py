@@ -1,7 +1,7 @@
 import unittest
 from ipaddress import IPv4Address, IPv6Address
 
-from openvpn_api.util import parsing
+from openvpn_management_api.util import parsing
 
 
 class TestUtilParsing(unittest.TestCase):

@@ -2,13 +2,13 @@ import unittest
 import datetime
 from ipaddress import IPv4Address
 
-import openvpn_api.models.state
-from openvpn_api.util import errors
+import openvpn_management_api.models.state
+from openvpn_management_api.util import errors
 
 
 class TestState(unittest.TestCase):
     def test_repr(self):
-        s = openvpn_api.models.state.State(
+        s = openvpn_management_api.models.state.State(
             datetime.datetime(2019, 6, 16, 21, 13, 21),
             "CONNECTED",
             "SUCCESS",
@@ -22,7 +22,7 @@ class TestState(unittest.TestCase):
         self.assertEqual("<State desc='SUCCESS', mode='server'>", repr(s))
 
     def test_init_none(self):
-        s = openvpn_api.models.state.State(None, None, None, None, None, None, None, None, None)
+        s = openvpn_management_api.models.state.State(None, None, None, None, None, None, None, None, None)
         self.assertIsNone(s.up_since)
         self.assertIsNone(s.state_name)
         self.assertIsNone(s.desc_string)
@@ -36,7 +36,7 @@ class TestState(unittest.TestCase):
         self.assertEqual("unknown", s.mode)
 
     def test_parse_raw(self):
-        s = openvpn_api.models.state.State.parse_raw("1560719601,CONNECTED,SUCCESS,10.0.0.1,,,1.2.3.4,1194\nEND")
+        s = openvpn_management_api.models.state.State.parse_raw("1560719601,CONNECTED,SUCCESS,10.0.0.1,,,1.2.3.4,1194\nEND")
         self.assertEqual(datetime.datetime(2019, 6, 16, 21, 13, 21), s.up_since)
         self.assertEqual("CONNECTED", s.state_name)
         self.assertEqual("SUCCESS", s.desc_string)
@@ -53,5 +53,5 @@ class TestState(unittest.TestCase):
 
     def test_parse_raw_empty(self):
         with self.assertRaises(errors.ParseError) as ctx:
-            openvpn_api.models.state.State.parse_raw("")
+            openvpn_management_api.models.state.State.parse_raw("")
         self.assertEqual("Did not get expected data from state.", str(ctx.exception))

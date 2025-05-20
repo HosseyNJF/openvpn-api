@@ -1,7 +1,7 @@
 import unittest
 from ipaddress import IPv4Address, IPv6Address
 
-from openvpn_api.models import VPNModelBase
+from openvpn_management_api.models import VPNModelBase
 
 
 class ModelStub(VPNModelBase):

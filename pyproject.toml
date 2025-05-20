@@ -1,3 +1,53 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openvpn-management-api"
+dynamic = ["version"]
+description = "A revised Python API for the OpenVPN management interface."
+readme = "README.md"
+authors = [
+    {name = "M. Hosseyn Najafi", email = "hosseynjf@icloud.com"}
+]
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+keywords = ["openvpn", "monitor", "management", "api"]
+requires-python = ">=3.6"
+dependencies = [
+    "openvpn_status < 1.0.0",
+]
+
+[project.urls]
+"Source" = "https://github.com/HosseyNJF/openvpn-management-api"
+"Bug Reports" = "https://github.com/HosseyNJF/openvpn-management-api/issues"
+"Homepage" = "https://github.com/HosseyNJF/openvpn-management-api"
+
+[project.optional-dependencies]
+dev = [
+    "nose",
+    "black",
+]
+
+[tool.setuptools]
+packages = {find = {exclude = ["tests"]}}
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
 [tool.black]
 line-length = 120
 target-version = ['py36']

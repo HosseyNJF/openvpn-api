@@ -1,6 +1,6 @@
 import unittest
-from openvpn_api.models import stats
-from openvpn_api.util import errors
+from openvpn_management_api.models import stats
+from openvpn_management_api.util import errors
 
 
 class TestServerStats(unittest.TestCase):

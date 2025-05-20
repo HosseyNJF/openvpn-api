@@ -1,8 +1,8 @@
 import re
 from typing import Optional
 
-from openvpn_api.models import VPNModelBase
-from openvpn_api.util import errors
+from openvpn_management_api.models import VPNModelBase
+from openvpn_management_api.util import errors
 
 
 class ServerStats(VPNModelBase):

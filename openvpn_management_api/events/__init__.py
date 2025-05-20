@@ -2,7 +2,7 @@ import pathlib
 import importlib
 from typing import List, Type
 
-from openvpn_api.events.base import BaseEvent
+from openvpn_management_api.events.base import BaseEvent
 
 # Registered server-transmitted events
 _events = []
@@ -24,5 +24,5 @@ def get_event_types() -> List[Type[BaseEvent]]:
 for _file in pathlib.Path(__file__).parent.glob("*.py"):
     if _file.name.startswith("_"):
         continue
-    importlib.import_module(f"openvpn_api.events.{_file.stem}")
+    importlib.import_module(f"openvpn_management_api.events.{_file.stem}")
 del _file  # Remove _file from module namespace after we're done

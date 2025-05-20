@@ -1,7 +1,6 @@
 # OpenVPN Management Interface Python API
 
-[![Build Status](https://travis-ci.org/Jamie-/openvpn-api.svg?branch=master)](https://travis-ci.org/Jamie-/openvpn-api)
-[![PyPI](https://img.shields.io/pypi/v/openvpn-api.svg)](https://pypi.org/project/openvpn-api/)
+[![PyPI](https://img.shields.io/pypi/v/openvpn-management-api.svg)](https://pypi.org/project/openvpn-management-api/)
 
 ## Summary
 
@@ -15,9 +14,9 @@ Very useful for extracting metrics and status from OpenVPN server management int
 This project was inspired by the work of Marcus Furlong in creating [openvpn-monitor](https://github.com/furlongm/openvpn-monitor).
 It also uses [openvpn-status](https://pypi.org/project/openvpn-status/) by Jiangge Zhang for parsing the output of the OpenVPN `status` command as there's no point reinventing the wheel when an excellent solution already exists.
 
-Release notes can be found [here on GitHub](https://github.com/HosseyNJF/openvpn-api/releases).
+Release notes can be found [here on GitHub](https://github.com/HosseyNJF/openvpn-management-api/releases).
 
-:warning: This project is not yet stable and there are no guarantees for it to work. You are welcome to [submit any bugs](https://github.com/HosseyNJF/openvpn-api/issues/new) you may encounter, and I'll be happy to help.
+:warning: This project is not yet stable and there are no guarantees for it to work. You are welcome to [submit any bugs](https://github.com/HosseyNJF/openvpn-management-api/issues/new) you may encounter, and I'll be happy to help.
 
 When using and developing this library, you may find the manual for the OpenVPN [management interface](https://openvpn.net/community-resources/controlling-a-running-openvpn-process/#using-the-management-interface) useful: https://openvpn.net/community-resources/management-interface/
 
@@ -32,13 +31,13 @@ Dependencies:
 
 #### Via PyPI
 ```
-pip install openvpn-api
+pip install openvpn-management-api
 ```
 
 #### Via Source
 ```
-git clone https://github.com/HosseyNJF/openvpn-api.git
-cd openvpn-api
+git clone https://github.com/HosseyNJF/openvpn-management-api.git
+cd openvpn-management-api
 python setup.py install
 ```
 
@@ -46,9 +45,11 @@ python setup.py install
 
 ### Introduction
 Create a `VPN` object for your management interface connection.
+
 ```python
-import openvpn_api.VPN
-v = openvpn_api.VPN('localhost', 7505)
+import openvpn_management_api.VPN
+
+v = openvpn_management_api.VPN('localhost', 7505)
 ```
 
 Then you can either manage connection and disconnection yourself
@@ -59,7 +60,7 @@ print(v.release)
 v.disconnect()
 ```
 If the connection is successful, `v.connect()` will return `True`.
-However, if the connection fails `v.connect()` will raise an `openvpn_api.errors.ConnectError` exception with the reason for the connection failure.
+However, if the connection fails `v.connect()` will raise an `openvpn_management_api.errors.ConnectError` exception with the reason for the connection failure.
 
 Or use the connection context manager
 ```python
@@ -92,7 +93,7 @@ These are represented by the `VPNType` class as `VPNType.IP` or `VPNType.UNIX_SO
 ```python
 >>> v.type
 'ip'
->>> v.type == openvpn_api.VPNType.IP
+>>> v.type == openvpn_management_api.VPNType.IP
 True
 ```
 

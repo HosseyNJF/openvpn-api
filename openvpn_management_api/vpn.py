@@ -13,12 +13,12 @@ from typing import Optional, Generator, Callable, Type, TypeVar, Dict, List
 import openvpn_status
 from openvpn_status.models import Status
 
-from openvpn_api import events
-from openvpn_api.events import BaseEvent
-from openvpn_api.events.updown import UpDownEvent
-from openvpn_api.models.state import State
-from openvpn_api.models.stats import ServerStats
-from openvpn_api.util import errors
+from openvpn_management_api import events
+from openvpn_management_api.events import BaseEvent
+from openvpn_management_api.events.updown import UpDownEvent
+from openvpn_management_api.models.state import State
+from openvpn_management_api.models.stats import ServerStats
+from openvpn_management_api.util import errors
 
 logger = logging.getLogger(__name__)
 

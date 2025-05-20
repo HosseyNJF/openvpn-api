@@ -34,9 +34,9 @@ The output format consists of up to 9 comma-separated parameters:
 import datetime
 from typing import Optional
 
-from openvpn_api.models import VPNModelBase
-from openvpn_api.util import errors, parsing
-from openvpn_api.util.parsing import IPAddress
+from openvpn_management_api.models import VPNModelBase
+from openvpn_management_api.util import errors, parsing
+from openvpn_management_api.util.parsing import IPAddress
 
 
 class State(VPNModelBase):
