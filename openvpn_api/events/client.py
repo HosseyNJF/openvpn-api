@@ -85,7 +85,7 @@ class ClientEvent(events.BaseEvent):
         assert "client_id" in first_line_data, "unexpected CLIENT real-time message, cannot parse"
         client_id = int(first_line_data["client_id"])
         key_id = int(first_line_data["key_id"]) if "key_id" in first_line_data else None
-        primary = int(first_line_data["key_id"]) if "key_id" in first_line_data else None
+        primary = int(first_line_data["primary"]) if "primary" in first_line_data else None
         address = str(first_line_data["address"]) if "address" in first_line_data else None
         environment = {}
 

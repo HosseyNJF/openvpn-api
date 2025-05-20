@@ -5,18 +5,19 @@
 
 ## Summary
 
-A Python API for interacting with the OpenVPN management interface.
-Currently a work in progress so support for client management interfaces and events is lacking.
+> [!IMPORTANT]
+> This project is a fork of the [Jamie-/openvpn-api](https://github.com/Jamie-/openvpn-api) project. It presents support for receiving events and registering callbacks for them, which is not present in the original version. The original repository is abandoned; this is an attempt at reviving it.
 
-Very useful for extracting metrics and status from OpenVPN server management interfaces.
+A Python API for interacting with the OpenVPN management interface.
+
+Very useful for extracting metrics and status from OpenVPN server management interfaces, and authorizing users with an external source.
 
 This project was inspired by the work of Marcus Furlong in creating [openvpn-monitor](https://github.com/furlongm/openvpn-monitor).
 It also uses [openvpn-status](https://pypi.org/project/openvpn-status/) by Jiangge Zhang for parsing the output of the OpenVPN `status` command as there's no point reinventing the wheel when an excellent solution already exists.
 
-Release notes can be found [here on GitHub](https://github.com/Jamie-/openvpn-api/releases).
+Release notes can be found [here on GitHub](https://github.com/HosseyNJF/openvpn-api/releases).
 
-:warning: Development work is done in master, if you wish to see the source for a release version, checkout the appropriate `releases/x.x.x` branch.
-The latest release version can be found here: [releases/0.3.x](https://github.com/Jamie-/openvpn-api/tree/releases/0.3.x).
+:warning: This project is not yet stable and there are no guarantees for it to work. You are welcome to [submit any bugs](https://github.com/HosseyNJF/openvpn-api/issues/new) you may encounter, and I'll be happy to help.
 
 When using and developing this library, you may find the manual for the OpenVPN [management interface](https://openvpn.net/community-resources/controlling-a-running-openvpn-process/#using-the-management-interface) useful: https://openvpn.net/community-resources/management-interface/
 
@@ -24,7 +25,7 @@ When using and developing this library, you may find the manual for the OpenVPN 
 ## Requirements
 This project requires Python >= 3.6.
 
-Other packages:
+Dependencies:
 * [openvpn-status](https://pypi.org/project/openvpn-status/)
 
 ## Installation
@@ -36,7 +37,7 @@ pip install openvpn-api
 
 #### Via Source
 ```
-git clone https://github.com/Jamie-/openvpn-api.git
+git clone https://github.com/HosseyNJF/openvpn-api.git
 cd openvpn-api
 python setup.py install
 ```
