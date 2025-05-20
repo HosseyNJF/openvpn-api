@@ -1,17 +1,20 @@
 import contextlib
 import logging
 import re
+from collections import defaultdict
+
 import select
 import socket
 import queue
 import threading
 from enum import Enum
-from typing import Optional, Generator, Callable, Set
+from typing import Optional, Generator, Callable, Type, TypeVar, Dict, List
 
 import openvpn_status
 from openvpn_status.models import Status
 
 from openvpn_api import events
+from openvpn_api.events import BaseEvent
 from openvpn_api.events.updown import UpDownEvent
 from openvpn_api.models.state import State
 from openvpn_api.models.stats import ServerStats
@@ -19,6 +22,8 @@ from openvpn_api.util import errors
 
 logger = logging.getLogger(__name__)
 
+
+T = TypeVar("T", bound=BaseEvent)
 
 class VPNType(str, Enum):
     IP = "ip"
@@ -40,7 +45,7 @@ class VPN:
         self._release: Optional[str] = None
 
         # Event system
-        self._callbacks: Set = set()
+        self._callbacks: Dict[Type[BaseEvent], List[Callable[[BaseEvent], None]]] = defaultdict(list)
         self._socket_thread: Optional[threading.Thread] = None
         self._stop_thread: threading.Event = threading.Event()
         self._try_reconnecting: threading.Event = threading.Event()
@@ -266,17 +271,17 @@ class VPN:
             self._socket_thread = None
         self._stop_thread.clear()
 
-    def register_callback(self, callable: Callable) -> None:
+    def register_callback(self, event_type: Type[T], callback: Callable[[T], None]) -> None:
         """Register a callback with the event handler for incoming messages.
         Callbacks should be kept as lightweight as possible and not perform any heavy or time consuming computation.
         NEVER send a command inside a callback. instead, add it to your own queue and process it outside the callback.
         TODO: Fix sending command inside callback
         """
-        self._callbacks.add(callable)
+        self._callbacks[event_type].append(callback)
 
     def raise_event(self, event: events.BaseEvent) -> None:
         """Handler for a raised event, calls all registered callables."""
-        for func in self._callbacks:
+        for func in self._callbacks[event.__class__]:
             try:
                 func(event)
             except Exception:  # Ignore exceptions as we want to call the other handlers

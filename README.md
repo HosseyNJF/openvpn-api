@@ -101,11 +101,10 @@ True
 The management interface emits events on specific occasions, as specified in [this documentation](https://openvpn.net/community-resources/management-interface/), that can be consumed using this library:
 
 ```python3
-def event_handler(event):
-    if isinstance(event, ClientEvent):
-        print(f"Received event: " + event.type)
+def event_handler(event: ClientEvent):
+    print(f"Received event: " + event.type)
 
-v.register_callback(event_handler)
+v.register_callback(ClientEvent, event_handler)
 ```
 
 #### Available events
