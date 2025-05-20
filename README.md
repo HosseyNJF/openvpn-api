@@ -96,6 +96,50 @@ These are represented by the `VPNType` class as `VPNType.IP` or `VPNType.UNIX_SO
 True
 ```
 
+### Consume events
+
+The management interface emits events on specific occasions, as specified in [this documentation](https://openvpn.net/community-resources/management-interface/), that can be consumed using this library:
+
+```python3
+def event_handler(event):
+    if isinstance(event, ClientEvent):
+        print(f"Received event: " + event.type)
+
+v.register_callback(event_handler)
+```
+
+#### Available events
+
+Two classes of events may be emitted by the server:
+
+##### UpDownEvent
+
+This event is fired when the server shuts down or is started.
+
+Available properties:
+
+`event.type` - either "UP" or "DOWN"
+
+##### ClientEvent
+
+This event is fired on client activity, such as `CONNECT`, `REAUTH`, `ESTABLISHED`, `DISCONNECT`, and `ADDRESS`.
+
+Available properties:
+
+| Name        | Value Type                                                        |
+|-------------|-------------------------------------------------------------------|
+| event_type  | Enum[`CONNECT`, `REAUTH`, `ESTABLISHED`, `DISCONNECT`, `ADDRESS`] |
+| client_id   | int                                                               |
+| key_id      | Optional[int]                                                     |
+| primary     | Optional[int]                                                     |
+| address     | Optional[str]                                                     |
+| environment | Dict[str, str]                                                    |
+
+#### Known limitations
+
+- Callbacks should be kept as lightweight as possible and not perform any heavy or time-consuming computation. If you need more, add the event to a queue and consume it separately.
+- **Never** send an OpenVPN command inside a callback. instead, add it to your own queue and process it outside the callback .
+
 ### Daemon Interaction
 All the properties that get information about the OpenVPN service you're connected to are stateful.
 The first time you call one of these methods it caches the information it needs so future calls are super fast.
